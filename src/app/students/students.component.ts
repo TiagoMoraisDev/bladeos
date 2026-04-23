@@ -97,6 +97,10 @@ export class StudentsComponent implements OnInit {
       this.modalError.set('O nome do aluno é obrigatório.');
       return;
     }
+    if (!this.form.class_id) {
+      this.modalError.set('Selecione uma turma para o aluno.');
+      return;
+    }
 
     this.saving.set(true);
     this.modalError.set(null);
