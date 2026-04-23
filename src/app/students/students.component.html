@@ -1,0 +1,223 @@
+<app-nav />
+
+<div class="min-h-screen bg-zinc-950 px-4 py-8">
+  <div class="max-w-5xl mx-auto">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-xl font-bold text-white">Alunos</h2>
+        <p class="text-zinc-400 text-sm mt-0.5">
+          {{ students().length }} aluno{{ students().length !== 1 ? 's' : '' }} cadastrado{{ students().length !== 1 ? 's' : '' }}
+        </p>
+      </div>
+      <button
+        (click)="openModal()"
+        class="flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-zinc-950"
+      >
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        Novo Aluno
+      </button>
+    </div>
+
+    <!-- Error -->
+    @if (error()) {
+      <div class="mb-4 rounded-lg px-4 py-3 text-sm bg-red-600/10 text-red-400 border border-red-600/20">
+        {{ error() }}
+      </div>
+    }
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="flex justify-center py-20">
+        <svg class="animate-spin h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+      </div>
+
+    <!-- Empty state -->
+    } @else if (students().length === 0) {
+      <div class="flex flex-col items-center justify-center py-20 text-center">
+        <div class="w-14 h-14 rounded-full bg-zinc-800 flex items-center justify-center mb-4">
+          <svg class="h-7 w-7 text-zinc-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+        </div>
+        <p class="text-zinc-400 font-medium">Nenhum aluno cadastrado</p>
+        <p class="text-zinc-600 text-sm mt-1">Clique em "Novo Aluno" para começar.</p>
+      </div>
+
+    <!-- Table -->
+    } @else {
+      <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-zinc-800">
+              <th class="text-left text-zinc-400 font-medium px-5 py-3">Nome</th>
+              <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden sm:table-cell">Classe</th>
+              <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden md:table-cell">E-mail</th>
+              <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden lg:table-cell">Telefone</th>
+              <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden xl:table-cell">Nascimento</th>
+              <th class="px-5 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (student of students(); track student.id) {
+              <tr class="border-b border-zinc-800/60 last:border-0 hover:bg-zinc-800/30 transition">
+                <td class="px-5 py-3.5 text-white font-medium">{{ student.name }}</td>
+                <td class="px-5 py-3.5 text-zinc-400 hidden sm:table-cell">{{ student.class || '—' }}</td>
+                <td class="px-5 py-3.5 text-zinc-400 hidden md:table-cell">{{ student.email || '—' }}</td>
+                <td class="px-5 py-3.5 text-zinc-400 hidden lg:table-cell">{{ student.phone || '—' }}</td>
+                <td class="px-5 py-3.5 text-zinc-400 hidden xl:table-cell">{{ formatDate(student.birth_date) }}</td>
+                <td class="px-5 py-3.5 text-right">
+                  <button
+                    (click)="openModal(student)"
+                    class="text-xs text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-md px-3 py-1.5 transition"
+                  >
+                    Editar
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+  </div>
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center px-4"
+    (click)="closeModal()"
+  >
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+
+    <!-- Panel -->
+    <div
+      class="relative w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-white font-bold text-lg">
+          {{ editingId() ? 'Editar Aluno' : 'Novo Aluno' }}
+        </h3>
+        <button
+          (click)="closeModal()"
+          class="text-zinc-500 hover:text-white transition"
+        >
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      @if (modalError()) {
+        <div class="mb-4 rounded-lg px-4 py-3 text-sm bg-red-600/10 text-red-400 border border-red-600/20">
+          {{ modalError() }}
+        </div>
+      }
+
+      <form (ngSubmit)="saveStudent()" #studentForm="ngForm">
+
+        <div class="mb-4">
+          <label for="name" class="block text-sm font-medium text-zinc-300 mb-1.5">
+            Nome <span class="text-red-500">*</span>
+          </label>
+          <input
+            id="name"
+            type="text"
+            name="name"
+            [(ngModel)]="form.name"
+            required
+            placeholder="Nome completo"
+            class="w-full bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="modalEmail" class="block text-sm font-medium text-zinc-300 mb-1.5">E-mail</label>
+          <input
+            id="modalEmail"
+            type="email"
+            name="modalEmail"
+            [(ngModel)]="form.email"
+            placeholder="aluno@exemplo.com"
+            class="w-full bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="phone" class="block text-sm font-medium text-zinc-300 mb-1.5">Telefone</label>
+          <input
+            id="phone"
+            type="tel"
+            name="phone"
+            [(ngModel)]="form.phone"
+            placeholder="(11) 99999-9999"
+            class="w-full bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="class" class="block text-sm font-medium text-zinc-300 mb-1.5">Classe</label>
+          <input
+            id="class"
+            type="text"
+            name="class"
+            [(ngModel)]="form.class"
+            placeholder="Ex: Turma A, 3º Ano..."
+            class="w-full bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition"
+          />
+        </div>
+
+        <div class="mb-6">
+          <label for="birthDate" class="block text-sm font-medium text-zinc-300 mb-1.5">
+            Data de nascimento
+          </label>
+          <input
+            id="birthDate"
+            type="date"
+            name="birthDate"
+            [(ngModel)]="form.birth_date"
+            class="w-full bg-zinc-800 border border-zinc-700 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition [color-scheme:dark]"
+          />
+        </div>
+
+        <div class="flex gap-3">
+          <button
+            type="button"
+            (click)="closeModal()"
+            class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold rounded-lg px-4 py-2.5 text-sm transition"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="saving()"
+            class="flex-1 bg-red-600 hover:bg-red-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-lg px-4 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-zinc-900"
+          >
+            @if (saving()) {
+              <span class="flex items-center justify-center gap-2">
+                <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                Salvando...
+              </span>
+            } @else {
+              {{ editingId() ? 'Salvar alterações' : 'Cadastrar aluno' }}
+            }
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}
