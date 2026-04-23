@@ -11,6 +11,16 @@ export interface Profile {
   updated_at?: string;
 }
 
+export interface Turma {
+  id?: string;
+  name: string;
+  days: string[];
+  start_time: string;
+  end_time: string;
+  created_at?: string;
+  created_by?: string;
+}
+
 export interface Student {
   id?: string;
   name: string;
@@ -18,6 +28,7 @@ export interface Student {
   phone?: string | null;
   birth_date?: string | null;
   class?: string | null;
+  class_id?: string | null;
   created_at?: string;
   created_by?: string;
 }
@@ -82,7 +93,7 @@ export class SupabaseService {
   getStudents() {
     return this.supabase
       .from('students')
-      .select('id, name, email, phone, birth_date, class, created_at')
+      .select('id, name, email, phone, birth_date, class, class_id, created_at')
       .order('name', { ascending: true });
   }
 
@@ -96,5 +107,24 @@ export class SupabaseService {
 
   deleteStudent(id: string) {
     return this.supabase.from('students').delete().eq('id', id);
+  }
+
+  getClasses() {
+    return this.supabase
+      .from('classes')
+      .select('id, name, days, start_time, end_time, created_at')
+      .order('name', { ascending: true });
+  }
+
+  createClass(turma: Omit<Turma, 'id' | 'created_at' | 'created_by'>) {
+    return this.supabase.from('classes').insert(turma).select().single();
+  }
+
+  updateClass(id: string, turma: Omit<Turma, 'id' | 'created_at' | 'created_by'>) {
+    return this.supabase.from('classes').update(turma).eq('id', id).select().single();
+  }
+
+  deleteClass(id: string) {
+    return this.supabase.from('classes').delete().eq('id', id);
   }
 }
