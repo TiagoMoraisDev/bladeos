@@ -1,0 +1,235 @@
+<app-nav />
+
+<div class="min-h-screen bg-zinc-950 px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+
+    <!-- Header -->
+    <div class="flex items-center gap-3 mb-6">
+      <a
+        routerLink="/configuracoes"
+        class="text-zinc-500 hover:text-white transition"
+        title="Voltar para Configurações"
+      >
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+        </svg>
+      </a>
+      <div class="flex-1">
+        <h2 class="text-xl font-bold text-white">Turmas</h2>
+        <p class="text-zinc-400 text-sm mt-0.5">
+          {{ classes().length }} turma{{ classes().length !== 1 ? 's' : '' }} cadastrada{{ classes().length !== 1 ? 's' : '' }}
+        </p>
+      </div>
+      <button
+        (click)="openModal()"
+        class="flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-zinc-950"
+      >
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        Nova Turma
+      </button>
+    </div>
+
+    <!-- Error -->
+    @if (error()) {
+      <div class="mb-4 rounded-lg px-4 py-3 text-sm bg-red-600/10 text-red-400 border border-red-600/20">
+        {{ error() }}
+      </div>
+    }
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="flex justify-center py-20">
+        <svg class="animate-spin h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+      </div>
+
+    <!-- Empty state -->
+    } @else if (classes().length === 0) {
+      <div class="flex flex-col items-center justify-center py-20 text-center">
+        <div class="w-14 h-14 rounded-full bg-zinc-800 flex items-center justify-center mb-4">
+          <svg class="h-7 w-7 text-zinc-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+          </svg>
+        </div>
+        <p class="text-zinc-400 font-medium">Nenhuma turma cadastrada</p>
+        <p class="text-zinc-600 text-sm mt-1">Clique em "Nova Turma" para começar.</p>
+      </div>
+
+    <!-- List -->
+    } @else {
+      <div class="grid gap-3 sm:grid-cols-2">
+        @for (turma of classes(); track turma.id) {
+          <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 flex flex-col gap-3">
+
+            <div class="flex items-start justify-between">
+              <h3 class="text-white font-semibold">{{ turma.name }}</h3>
+              <button
+                (click)="openModal(turma)"
+                class="text-xs text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-md px-3 py-1 transition shrink-0 ml-3"
+              >
+                Editar
+              </button>
+            </div>
+
+            <div class="flex flex-wrap gap-1.5">
+              @for (day of allDays; track day.key) {
+                <span
+                  class="text-xs font-medium px-2 py-0.5 rounded-md"
+                  [class.bg-red-600]="turma.days.includes(day.key)"
+                  [class.text-white]="turma.days.includes(day.key)"
+                  [class.bg-zinc-800]="!turma.days.includes(day.key)"
+                  [class.text-zinc-600]="!turma.days.includes(day.key)"
+                >
+                  {{ day.label }}
+                </span>
+              }
+            </div>
+
+            <div class="flex items-center gap-2 text-sm text-zinc-400">
+              <svg class="h-4 w-4 text-zinc-600 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+              {{ formatTime(turma.start_time) }} – {{ formatTime(turma.end_time) }}
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center px-4"
+    (click)="closeModal()"
+  >
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+
+    <div
+      class="relative w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-white font-bold text-lg">
+          {{ editingId() ? 'Editar Turma' : 'Nova Turma' }}
+        </h3>
+        <button (click)="closeModal()" class="text-zinc-500 hover:text-white transition">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      @if (modalError()) {
+        <div class="mb-4 rounded-lg px-4 py-3 text-sm bg-red-600/10 text-red-400 border border-red-600/20">
+          {{ modalError() }}
+        </div>
+      }
+
+      <form (ngSubmit)="saveClass()">
+
+        <!-- Nome -->
+        <div class="mb-5">
+          <label for="className" class="block text-sm font-medium text-zinc-300 mb-1.5">
+            Nome <span class="text-red-500">*</span>
+          </label>
+          <input
+            id="className"
+            type="text"
+            name="className"
+            [(ngModel)]="form.name"
+            placeholder="Ex: Turma A, Iniciantes..."
+            class="w-full bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition"
+          />
+        </div>
+
+        <!-- Dias da semana -->
+        <div class="mb-5">
+          <label class="block text-sm font-medium text-zinc-300 mb-2">
+            Dias da semana <span class="text-red-500">*</span>
+          </label>
+          <div class="flex gap-2 flex-wrap">
+            @for (day of allDays; track day.key) {
+              <button
+                type="button"
+                (click)="toggleDay(day.key)"
+                class="px-3 py-1.5 rounded-lg text-sm font-medium transition focus:outline-none"
+                [class.bg-red-600]="isDaySelected(day.key)"
+                [class.text-white]="isDaySelected(day.key)"
+                [class.bg-zinc-800]="!isDaySelected(day.key)"
+                [class.text-zinc-400]="!isDaySelected(day.key)"
+                [class.hover:bg-zinc-700]="!isDaySelected(day.key)"
+              >
+                {{ day.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Horários -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div>
+            <label for="startTime" class="block text-sm font-medium text-zinc-300 mb-1.5">
+              Início <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="startTime"
+              type="time"
+              name="startTime"
+              [(ngModel)]="form.start_time"
+              class="w-full bg-zinc-800 border border-zinc-700 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition [color-scheme:dark]"
+            />
+          </div>
+          <div>
+            <label for="endTime" class="block text-sm font-medium text-zinc-300 mb-1.5">
+              Término <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="endTime"
+              type="time"
+              name="endTime"
+              [(ngModel)]="form.end_time"
+              class="w-full bg-zinc-800 border border-zinc-700 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition [color-scheme:dark]"
+            />
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <button
+            type="button"
+            (click)="closeModal()"
+            class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold rounded-lg px-4 py-2.5 text-sm transition"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="saving()"
+            class="flex-1 bg-red-600 hover:bg-red-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-lg px-4 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-zinc-900"
+          >
+            @if (saving()) {
+              <span class="flex items-center justify-center gap-2">
+                <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                Salvando...
+              </span>
+            } @else {
+              {{ editingId() ? 'Salvar alterações' : 'Cadastrar turma' }}
+            }
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}
