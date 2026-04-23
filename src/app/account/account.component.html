@@ -1,0 +1,109 @@
+<app-nav />
+
+<div class="min-h-screen bg-zinc-950 px-4 py-8">
+  <div class="max-w-lg mx-auto">
+
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-white">Minha Conta</h2>
+      <p class="mt-1 text-zinc-400 text-sm">Gerencie seu perfil</p>
+    </div>
+
+    @if (loading()) {
+      <div class="flex justify-center py-16">
+        <svg class="animate-spin h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+      </div>
+    } @else {
+      <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-xl">
+
+        @if (error()) {
+          <div class="mb-5 rounded-lg px-4 py-3 text-sm font-medium bg-red-600/10 text-red-400 border border-red-600/20">
+            {{ error() }}
+          </div>
+        }
+
+        @if (saved()) {
+          <div class="mb-5 rounded-lg px-4 py-3 text-sm font-medium bg-zinc-800 text-zinc-300 border border-zinc-700">
+            Perfil atualizado com sucesso!
+          </div>
+        }
+
+        <form (ngSubmit)="updateProfile()" #profileForm="ngForm">
+
+          <div class="mb-5">
+            <label class="block text-sm font-medium text-zinc-300 mb-1.5">E-mail</label>
+            <input
+              type="text"
+              [value]="user?.email ?? ''"
+              disabled
+              class="w-full bg-zinc-800/50 border border-zinc-700 text-zinc-500 rounded-lg px-4 py-2.5 text-sm cursor-not-allowed"
+            />
+          </div>
+
+          <div class="mb-5">
+            <label for="fullName" class="block text-sm font-medium text-zinc-300 mb-1.5">
+              Nome completo
+            </label>
+            <input
+              id="fullName"
+              type="text"
+              name="fullName"
+              [(ngModel)]="profile.full_name"
+              placeholder="João Silva"
+              class="w-full bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition"
+            />
+          </div>
+
+          <div class="mb-5">
+            <label for="username" class="block text-sm font-medium text-zinc-300 mb-1.5">
+              Nome de usuário
+            </label>
+            <input
+              id="username"
+              type="text"
+              name="username"
+              [(ngModel)]="profile.username"
+              placeholder="joaosilva"
+              class="w-full bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition"
+            />
+          </div>
+
+          <div class="mb-6">
+            <label for="website" class="block text-sm font-medium text-zinc-300 mb-1.5">
+              Website
+            </label>
+            <input
+              id="website"
+              type="url"
+              name="website"
+              [(ngModel)]="profile.website"
+              placeholder="https://exemplo.com"
+              class="w-full bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition"
+            />
+          </div>
+
+          <button
+            type="submit"
+            [disabled]="saving()"
+            class="w-full bg-red-600 hover:bg-red-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-lg px-4 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-zinc-900"
+          >
+            @if (saving()) {
+              <span class="flex items-center justify-center gap-2">
+                <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                Salvando...
+              </span>
+            } @else {
+              Salvar alterações
+            }
+          </button>
+
+        </form>
+      </div>
+    }
+  </div>
+</div>
