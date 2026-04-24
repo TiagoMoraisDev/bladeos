@@ -1,0 +1,92 @@
+<div class="relative w-full h-full">
+
+  <!-- Trigger -->
+  <button
+    type="button"
+    (click)="toggle()"
+    class="w-full h-full flex flex-col px-4 py-3 hover:bg-zinc-800/40 rounded-l-2xl transition text-left focus:outline-none"
+  >
+    <span class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wide mb-1">Data</span>
+    <span
+      class="text-sm font-medium"
+      [class.text-white]="value()"
+      [class.text-zinc-600]="!value()"
+    >
+      {{ displayValue() }}
+    </span>
+  </button>
+
+  @if (open()) {
+    <!-- Backdrop -->
+    <div class="fixed inset-0 z-10" (click)="open.set(false)"></div>
+
+    <!-- Calendar panel -->
+    <div class="absolute left-0 top-full mt-2 z-20 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl p-4 w-72 select-none">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-4">
+        <button
+          type="button"
+          (click)="prevMonth()"
+          class="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-800 hover:text-white transition"
+        >
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+          </svg>
+        </button>
+
+        <span class="text-sm font-semibold text-white">{{ monthLabel() }}</span>
+
+        <button
+          type="button"
+          (click)="canGoNext() && nextMonth()"
+          [disabled]="!canGoNext()"
+          class="w-8 h-8 flex items-center justify-center rounded-lg transition"
+          [class.text-zinc-400]="canGoNext()"
+          [class.hover:bg-zinc-800]="canGoNext()"
+          [class.hover:text-white]="canGoNext()"
+          [class.text-zinc-700]="!canGoNext()"
+          [class.cursor-not-allowed]="!canGoNext()"
+        >
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Week day labels -->
+      <div class="grid grid-cols-7 mb-1">
+        @for (d of weekDays; track d) {
+          <div class="text-center text-[10px] font-semibold text-zinc-600 pb-2">{{ d }}</div>
+        }
+      </div>
+
+      <!-- Day grid -->
+      <div class="grid grid-cols-7 gap-y-1">
+        @for (day of calendarDays(); track day.date) {
+          <button
+            type="button"
+            (click)="selectDay(day)"
+            [disabled]="day.isDisabled"
+            class="flex items-center justify-center h-8 w-8 mx-auto rounded-lg text-xs font-medium transition focus:outline-none"
+            [class.bg-red-600]="day.isSelected"
+            [class.font-bold]="day.isSelected"
+            [class.text-white]="day.isSelected"
+            [class.ring-1]="day.isToday && !day.isSelected && !day.isDisabled"
+            [class.ring-red-500]="day.isToday && !day.isSelected && !day.isDisabled"
+            [class.text-red-400]="day.isToday && !day.isSelected && !day.isDisabled"
+            [class.text-white]="day.currentMonth && !day.isSelected && !day.isDisabled"
+            [class.text-zinc-600]="!day.currentMonth && !day.isSelected && !day.isDisabled"
+            [class.text-zinc-700]="day.isDisabled"
+            [class.cursor-not-allowed]="day.isDisabled"
+            [class.hover:bg-zinc-800]="!day.isSelected && !day.isDisabled"
+          >
+            {{ day.day }}
+          </button>
+        }
+      </div>
+
+    </div>
+  }
+
+</div>

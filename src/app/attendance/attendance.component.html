@@ -9,32 +9,77 @@
     </div>
 
     <!-- Filters -->
-    <div class="grid grid-cols-2 gap-3 mb-6">
-      <div>
-        <label for="date" class="block text-xs font-medium text-zinc-400 mb-1.5">Data</label>
-        <input
-          id="date"
-          type="date"
-          name="date"
-          [(ngModel)]="selectedDate"
-          (ngModelChange)="onFilterChange()"
-          class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition scheme-dark"
+    <div class="flex mb-6 bg-zinc-900 border border-zinc-800 rounded-2xl">
+      <!-- Data -->
+      <div class="flex-1 border-r border-zinc-800">
+        <app-date-picker
+          [value]="selectedDate"
+          (valueChange)="selectedDate = $event; onFilterChange()"
         />
       </div>
-      <div>
-        <label for="turma" class="block text-xs font-medium text-zinc-400 mb-1.5">Turma</label>
-        <select
-          id="turma"
-          name="turma"
-          [(ngModel)]="selectedClassId"
-          (ngModelChange)="onFilterChange()"
-          class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition"
+
+      <!-- Turma (custom dropdown) -->
+      <div class="flex-1 relative">
+        <button
+          type="button"
+          (click)="turmaDropdownOpen.update(v => !v)"
+          class="w-full h-full flex flex-col px-4 py-3 hover:bg-zinc-800/40 rounded-r-2xl transition text-left focus:outline-none"
         >
-          <option value="" disabled>Selecionar...</option>
-          @for (turma of turmas(); track turma.id) {
-            <option [value]="turma.id">{{ turma.name }}</option>
-          }
-        </select>
+          <span class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wide mb-1"
+            >Turma</span
+          >
+          <span
+            class="text-sm font-medium truncate"
+            [class.text-white]="selectedTurma"
+            [class.text-zinc-600]="!selectedTurma"
+          >
+            {{ selectedTurma ? selectedTurma.name : 'Selecionar...' }}
+          </span>
+        </button>
+
+        @if (turmaDropdownOpen()) {
+          <div class="fixed inset-0 z-10" (click)="turmaDropdownOpen.set(false)"></div>
+          <div
+            class="absolute right-0 top-full mt-2 w-64 z-20 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden"
+          >
+            @if (turmas().length === 0) {
+              <p class="px-4 py-3 text-sm text-zinc-500">Nenhuma turma cadastrada.</p>
+            }
+            @for (turma of turmas(); track turma.id) {
+              <button
+                type="button"
+                (click)="pickTurma(turma.id!)"
+                class="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-zinc-800 transition border-b border-zinc-800/60 last:border-0"
+                [class.text-white]="selectedClassId === turma.id"
+                [class.text-zinc-400]="selectedClassId !== turma.id"
+              >
+                <div>
+                  <p class="text-sm font-medium">{{ turma.name }}</p>
+                  <p class="text-xs text-zinc-600 mt-0.5">
+                    {{ formatDays(turma.days) }} · {{ formatTime(turma.start_time) }}–{{
+                      formatTime(turma.end_time)
+                    }}
+                  </p>
+                </div>
+                @if (selectedClassId === turma.id) {
+                  <svg
+                    class="h-4 w-4 text-red-500 shrink-0 ml-3"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m4.5 12.75 6 6 9-13.5"
+                    />
+                  </svg>
+                }
+              </button>
+            }
+          </div>
+        }
       </div>
     </div>
 

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Attendance, Student, Turma, SupabaseService } from '../services/supabase.service';
 import { NavComponent } from '../shared/nav.component';
+import { DatePickerComponent } from '../shared/date-picker.component';
 
 interface AttendanceRow {
   student: Student;
@@ -12,7 +13,7 @@ interface AttendanceRow {
 @Component({
   selector: 'app-attendance',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavComponent],
+  imports: [CommonModule, FormsModule, NavComponent, DatePickerComponent],
   templateUrl: './attendance.component.html',
 })
 export class AttendanceComponent implements OnInit {
@@ -21,6 +22,7 @@ export class AttendanceComponent implements OnInit {
 
   selectedDate = this.todayStr();
   selectedClassId = '';
+  turmaDropdownOpen = signal(false);
 
   loading = signal(false);
   saving = signal(false);
@@ -112,6 +114,12 @@ export class AttendanceComponent implements OnInit {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  pickTurma(id: string) {
+    this.selectedClassId = id;
+    this.turmaDropdownOpen.set(false);
+    this.onFilterChange();
   }
 
   togglePresence(row: AttendanceRow) {
