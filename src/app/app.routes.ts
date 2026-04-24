@@ -13,6 +13,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'frequencia',
+    loadComponent: () => import('./attendance/attendance.component').then(m => m.AttendanceComponent),
+    canActivate: [authGuard],
+  },
+  {
     path: 'configuracoes',
     loadComponent: () => import('./settings/settings.component').then(m => m.SettingsComponent),
     canActivate: [authGuard],

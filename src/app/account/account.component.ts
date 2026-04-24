@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Profile, SupabaseService } from '../services/supabase.service';
 import { NavComponent } from '../shared/nav.component';
 import { User } from '@supabase/supabase-js';
@@ -20,7 +21,10 @@ export class AccountComponent implements OnInit {
   user: User | null = null;
   profile: Profile = {};
 
-  constructor(private supabase: SupabaseService) {}
+  constructor(
+    private supabase: SupabaseService,
+    private router: Router,
+  ) {}
 
   async ngOnInit() {
     this.loading.set(true);
@@ -56,4 +60,8 @@ export class AccountComponent implements OnInit {
     }
   }
 
+  async signOut() {
+    await this.supabase.signOut();
+    this.router.navigate(['/login']);
+  }
 }

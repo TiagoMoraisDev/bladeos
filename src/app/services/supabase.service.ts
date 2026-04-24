@@ -2,6 +2,17 @@ import { Injectable } from '@angular/core';
 import { AuthChangeEvent, createClient, Session, SupabaseClient, User } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
 
+export interface Attendance {
+  id?: string;
+  date: string;
+  student_name: string;
+  student_id: string;
+  class_name: string;
+  class_id: string;
+  status: 0 | 1 | 2;
+  created_by?: string;
+}
+
 export interface Profile {
   id?: string;
   full_name?: string | null;
@@ -97,6 +108,14 @@ export class SupabaseService {
       .order('name', { ascending: true });
   }
 
+  getStudentsByClass(classId: string) {
+    return this.supabase
+      .from('students')
+      .select('id, name, class, class_id')
+      .eq('class_id', classId)
+      .order('name', { ascending: true });
+  }
+
   createStudent(student: Omit<Student, 'id' | 'created_at' | 'created_by'>) {
     return this.supabase.from('students').insert(student).select().single();
   }
@@ -126,5 +145,19 @@ export class SupabaseService {
 
   deleteClass(id: string) {
     return this.supabase.from('classes').delete().eq('id', id);
+  }
+
+  getAttendance(date: string, classId: string) {
+    return this.supabase
+      .from('attendance')
+      .select('id, date, student_name, student_id, class_name, class_id, status')
+      .eq('date', date)
+      .eq('class_id', classId);
+  }
+
+  upsertAttendance(records: Omit<Attendance, 'id' | 'created_by'>[]) {
+    return this.supabase
+      .from('attendance')
+      .upsert(records, { onConflict: 'date,student_id' });
   }
 }
