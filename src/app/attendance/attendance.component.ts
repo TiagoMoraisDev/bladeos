@@ -33,7 +33,7 @@ export class AttendanceComponent implements OnInit {
   }
 
   get selectedTurma(): Turma | null {
-    return this.turmas().find(t => t.id === this.selectedClassId) ?? null;
+    return this.turmas().find((t) => t.id === this.selectedClassId) ?? null;
   }
 
   constructor(private supabase: SupabaseService) {}
@@ -41,6 +41,38 @@ export class AttendanceComponent implements OnInit {
   async ngOnInit() {
     const { data } = await this.supabase.getClasses();
     this.turmas.set(data ?? []);
+    this.selectClosestClass();
+  }
+
+  private selectClosestClass() {
+    const turmas = this.turmas();
+    if (!turmas.length) return;
+
+    const now = new Date();
+    const dayKeys = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
+    const currentDay = dayKeys[now.getDay()];
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    const todayTurmas = turmas.filter((t) => t.days.includes(currentDay));
+    const candidates = todayTurmas.length > 0 ? todayTurmas : turmas;
+
+    let closest: Turma | null = null;
+    let minDiff = Infinity;
+
+    for (const turma of candidates) {
+      const [h, m] = turma.start_time.split(':').map(Number);
+      const startMinutes = h * 60 + m;
+      const diff = Math.abs(startMinutes - currentMinutes);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closest = turma;
+      }
+    }
+
+    if (closest?.id) {
+      this.selectedClassId = closest.id;
+      this.onFilterChange();
+    }
   }
 
   async onFilterChange() {
@@ -70,7 +102,7 @@ export class AttendanceComponent implements OnInit {
       }
 
       this.rows.set(
-        (studentsRes.data ?? []).map(student => ({
+        (studentsRes.data ?? []).map((student) => ({
           student,
           status: existingMap.get(student.id!) ?? 0,
         })),
@@ -84,8 +116,8 @@ export class AttendanceComponent implements OnInit {
 
   cycleStatus(row: AttendanceRow) {
     const next = ((row.status + 1) % 3) as 0 | 1 | 2;
-    this.rows.update(rows =>
-      rows.map(r => (r.student.id === row.student.id ? { ...r, status: next } : r)),
+    this.rows.update((rows) =>
+      rows.map((r) => (r.student.id === row.student.id ? { ...r, status: next } : r)),
     );
   }
 
@@ -99,7 +131,7 @@ export class AttendanceComponent implements OnInit {
     this.saveError.set(null);
 
     try {
-      const records: Omit<Attendance, 'id' | 'created_by'>[] = this.rows().map(r => ({
+      const records: Omit<Attendance, 'id' | 'created_by'>[] = this.rows().map((r) => ({
         date,
         student_id: r.student.id!,
         student_name: r.student.name,
@@ -125,10 +157,15 @@ export class AttendanceComponent implements OnInit {
 
   formatDays(days: string[]): string {
     const map: Record<string, string> = {
-      seg: 'Seg', ter: 'Ter', qua: 'Qua',
-      qui: 'Qui', sex: 'Sex', sab: 'Sáb', dom: 'Dom',
+      seg: 'Seg',
+      ter: 'Ter',
+      qua: 'Qua',
+      qui: 'Qui',
+      sex: 'Sex',
+      sab: 'Sáb',
+      dom: 'Dom',
     };
-    return days?.map(d => map[d] ?? d).join(', ') ?? '';
+    return days?.map((d) => map[d] ?? d).join(', ') ?? '';
   }
 
   formatTime(time: string): string {
