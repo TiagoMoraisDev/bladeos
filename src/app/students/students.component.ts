@@ -128,6 +128,16 @@ export class StudentsComponent implements OnInit {
     return new Date(date + 'T00:00:00').toLocaleDateString('pt-BR');
   }
 
+  calcAge(birthDate: string | null | undefined): string {
+    if (!birthDate) return '—';
+    const today = new Date();
+    const birth = new Date(birthDate + 'T00:00:00');
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+    return age + ' anos';
+  }
+
   formatDays(days: string[]): string {
     const map: Record<string, string> = {
       seg: 'Seg', ter: 'Ter', qua: 'Qua',

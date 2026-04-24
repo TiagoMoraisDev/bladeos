@@ -58,8 +58,9 @@
             <tr class="border-b border-zinc-800">
               <th class="text-left text-zinc-400 font-medium px-5 py-3">Nome</th>
               <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden sm:table-cell">Classe</th>
-              <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden md:table-cell">E-mail</th>
-              <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden lg:table-cell">Telefone</th>
+              <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden md:table-cell">Idade</th>
+              <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden lg:table-cell">E-mail</th>
+              <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden xl:table-cell">Telefone</th>
               <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden xl:table-cell">Nascimento</th>
               <th class="px-5 py-3"></th>
             </tr>
@@ -69,8 +70,9 @@
               <tr class="border-b border-zinc-800/60 last:border-0 hover:bg-zinc-800/30 transition">
                 <td class="px-5 py-3.5 text-white font-medium">{{ student.name }}</td>
                 <td class="px-5 py-3.5 text-zinc-400 hidden sm:table-cell">{{ student.class || '—' }}</td>
-                <td class="px-5 py-3.5 text-zinc-400 hidden md:table-cell">{{ student.email || '—' }}</td>
-                <td class="px-5 py-3.5 text-zinc-400 hidden lg:table-cell">{{ student.phone || '—' }}</td>
+                <td class="px-5 py-3.5 text-zinc-400 hidden md:table-cell">{{ calcAge(student.birth_date) }}</td>
+                <td class="px-5 py-3.5 text-zinc-400 hidden lg:table-cell">{{ student.email || '—' }}</td>
+                <td class="px-5 py-3.5 text-zinc-400 hidden xl:table-cell">{{ student.phone || '—' }}</td>
                 <td class="px-5 py-3.5 text-zinc-400 hidden xl:table-cell">{{ formatDate(student.birth_date) }}</td>
                 <td class="px-5 py-3.5 text-right">
                   <button
@@ -142,6 +144,22 @@
         </div>
 
         <div class="mb-4">
+          <label for="birthDate" class="block text-sm font-medium text-zinc-300 mb-1.5">
+            Data de nascimento
+          </label>
+          <input
+            id="birthDate"
+            type="date"
+            name="birthDate"
+            [(ngModel)]="form.birth_date"
+            class="w-full bg-zinc-800 border border-zinc-700 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition [color-scheme:dark]"
+          />
+          @if (form.birth_date) {
+            <p class="text-xs text-zinc-500 mt-1.5">Idade: {{ calcAge(form.birth_date) }}</p>
+          }
+        </div>
+
+        <div class="mb-4">
           <label for="modalEmail" class="block text-sm font-medium text-zinc-300 mb-1.5">E-mail</label>
           <input
             id="modalEmail"
@@ -165,7 +183,7 @@
           />
         </div>
 
-        <div class="mb-4">
+        <div class="mb-6">
           <label class="block text-sm font-medium text-zinc-300 mb-2">
             Turma <span class="text-red-500">*</span>
           </label>
@@ -205,19 +223,6 @@
               }
             </div>
           }
-        </div>
-
-        <div class="mb-6">
-          <label for="birthDate" class="block text-sm font-medium text-zinc-300 mb-1.5">
-            Data de nascimento
-          </label>
-          <input
-            id="birthDate"
-            type="date"
-            name="birthDate"
-            [(ngModel)]="form.birth_date"
-            class="w-full bg-zinc-800 border border-zinc-700 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition [color-scheme:dark]"
-          />
         </div>
 
         <div class="flex gap-3">
