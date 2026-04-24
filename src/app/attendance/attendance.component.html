@@ -2,7 +2,6 @@
 
 <div class="min-h-screen bg-zinc-950 px-4 py-8">
   <div class="max-w-2xl mx-auto">
-
     <!-- Header -->
     <div class="mb-6">
       <h2 class="text-xl font-bold text-white">Frequência</h2>
@@ -42,10 +41,22 @@
     <!-- Turma info badge -->
     @if (selectedTurma) {
       <div class="flex items-center gap-2 mb-4 text-xs text-zinc-500">
-        <svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        <svg
+          class="h-3.5 w-3.5 shrink-0"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.75"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+          />
         </svg>
-        {{ formatDays(selectedTurma.days) }} · {{ formatTime(selectedTurma.start_time) }}–{{ formatTime(selectedTurma.end_time) }}
+        {{ formatDays(selectedTurma.days) }} · {{ formatTime(selectedTurma.start_time) }}–{{
+          formatTime(selectedTurma.end_time)
+        }}
         @if (!isToday) {
           <span class="ml-auto text-amber-500/80 font-medium">Data passada — edição bloqueada</span>
         }
@@ -56,43 +67,62 @@
     @if (loading()) {
       <div class="flex justify-center py-20">
         <svg class="animate-spin h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
         </svg>
       </div>
 
-    <!-- Empty filter state -->
+      <!-- Empty filter state -->
     } @else if (!selectedDate || !selectedClassId) {
       <div class="flex flex-col items-center justify-center py-20 text-center">
         <div class="w-14 h-14 rounded-full bg-zinc-800 flex items-center justify-center mb-4">
-          <svg class="h-7 w-7 text-zinc-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+          <svg
+            class="h-7 w-7 text-zinc-500"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
+            />
           </svg>
         </div>
         <p class="text-zinc-400 font-medium">Selecione a data e a turma</p>
         <p class="text-zinc-600 text-sm mt-1">A lista de alunos aparecerá aqui.</p>
       </div>
 
-    <!-- No students -->
+      <!-- No students -->
     } @else if (rows().length === 0) {
       <div class="flex flex-col items-center justify-center py-20 text-center">
         <p class="text-zinc-400 font-medium">Nenhum aluno nesta turma</p>
         <p class="text-zinc-600 text-sm mt-1">Cadastre alunos e vincule-os a esta turma.</p>
       </div>
 
-    <!-- Student list -->
+      <!-- Student list -->
     } @else {
       @if (error()) {
-        <div class="mb-4 rounded-lg px-4 py-3 text-sm bg-red-600/10 text-red-400 border border-red-600/20">
+        <div
+          class="mb-4 rounded-lg px-4 py-3 text-sm bg-red-600/10 text-red-400 border border-red-600/20"
+        >
           {{ error() }}
         </div>
       }
 
       <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden mb-4">
         @for (row of rows(); track row.student.id) {
-          <div class="flex items-center justify-between px-5 py-3.5 border-b border-zinc-800/60 last:border-0">
-
+          <div
+            class="flex items-center justify-between px-5 py-3.5 border-b border-zinc-800/60 last:border-0"
+          >
             <span class="text-white text-sm font-medium">{{ row.student.name }}</span>
 
             <!-- Status button -->
@@ -100,7 +130,7 @@
               type="button"
               (click)="cycleStatus(row)"
               [disabled]="!isToday"
-              class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
+              class="inline-flex flex-col items-center justify-center gap-1 text-[12px] font-semibold px-2 py-2 rounded-lg border transition focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
               [class.bg-red-600/10]="row.status === 0"
               [class.border-red-600/30]="row.status === 0"
               [class.text-red-400]="row.status === 0"
@@ -115,35 +145,60 @@
               [class.hover:bg-amber-500/20]="row.status === 2 && isToday"
             >
               @if (row.status === 0) {
-                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <svg
+                  class="h-3.5 w-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  viewBox="0 0 24 24"
+                >
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
-                Faltou
+                Ausente
               } @else if (row.status === 1) {
-                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <svg
+                  class="h-3.5 w-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  viewBox="0 0 24 24"
+                >
                   <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>
                 Presente
               } @else {
-                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                <svg
+                  class="h-3.5 w-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+                  />
                 </svg>
-                Com motivo
+                Justificado
               }
             </button>
-
           </div>
         }
       </div>
 
       <!-- Save area -->
       @if (saveError()) {
-        <div class="mb-3 rounded-lg px-4 py-3 text-sm bg-red-600/10 text-red-400 border border-red-600/20">
+        <div
+          class="mb-3 rounded-lg px-4 py-3 text-sm bg-red-600/10 text-red-400 border border-red-600/20"
+        >
           {{ saveError() }}
         </div>
       }
       @if (saved()) {
-        <div class="mb-3 rounded-lg px-4 py-3 text-sm bg-zinc-800 text-zinc-300 border border-zinc-700">
+        <div
+          class="mb-3 rounded-lg px-4 py-3 text-sm bg-zinc-800 text-zinc-300 border border-zinc-700"
+        >
           Frequência salva com sucesso!
         </div>
       }
@@ -156,7 +211,14 @@
         @if (saving()) {
           <span class="flex items-center justify-center gap-2">
             <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
             </svg>
             Salvando...
@@ -166,6 +228,5 @@
         }
       </button>
     }
-
   </div>
 </div>
