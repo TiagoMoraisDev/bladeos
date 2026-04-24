@@ -114,8 +114,15 @@ export class AttendanceComponent implements OnInit {
     }
   }
 
-  cycleStatus(row: AttendanceRow) {
-    const next = ((row.status + 1) % 3) as 0 | 1 | 2;
+  togglePresence(row: AttendanceRow) {
+    const next: 0 | 1 = row.status === 1 ? 0 : 1;
+    this.rows.update((rows) =>
+      rows.map((r) => (r.student.id === row.student.id ? { ...r, status: next } : r)),
+    );
+  }
+
+  toggleJustificado(row: AttendanceRow) {
+    const next: 0 | 2 = row.status === 2 ? 0 : 2;
     this.rows.update((rows) =>
       rows.map((r) => (r.student.id === row.student.id ? { ...r, status: next } : r)),
     );

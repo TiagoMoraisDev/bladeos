@@ -125,53 +125,26 @@
           >
             <span class="text-white text-sm font-medium">{{ row.student.name }}</span>
 
-            <!-- Status button -->
-            <button
-              type="button"
-              (click)="cycleStatus(row)"
-              [disabled]="!isToday"
-              class="inline-flex flex-col items-center justify-center gap-1 text-[12px] font-semibold px-2 py-2 rounded-lg border transition focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
-              [class.bg-red-600/10]="row.status === 0"
-              [class.border-red-600/30]="row.status === 0"
-              [class.text-red-400]="row.status === 0"
-              [class.hover:bg-red-600/20]="row.status === 0 && isToday"
-              [class.bg-green-600/10]="row.status === 1"
-              [class.border-green-600/30]="row.status === 1"
-              [class.text-green-400]="row.status === 1"
-              [class.hover:bg-green-600/20]="row.status === 1 && isToday"
-              [class.bg-amber-500/10]="row.status === 2"
-              [class.border-amber-500/30]="row.status === 2"
-              [class.text-amber-400]="row.status === 2"
-              [class.hover:bg-amber-500/20]="row.status === 2 && isToday"
-            >
-              @if (row.status === 0) {
+            <!-- Buttons -->
+            <div class="flex items-center gap-2 shrink-0">
+              <!-- Justificado -->
+              <button
+                type="button"
+                (click)="toggleJustificado(row)"
+                [disabled]="!isToday"
+                class="inline-flex flex-col items-center justify-center gap-1 px-4 py-4 rounded-lg border text-[10px] font-semibold transition focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed"
+                [class.bg-amber-500/15]="row.status === 2"
+                [class.border-amber-500/40]="row.status === 2"
+                [class.text-amber-400]="row.status === 2"
+                [class.bg-zinc-800]="row.status !== 2"
+                [class.border-zinc-700]="row.status !== 2"
+                [class.text-zinc-500]="row.status !== 2"
+              >
                 <svg
-                  class="h-3.5 w-3.5"
+                  class="h-6 w-6"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2.5"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                </svg>
-                Ausente
-              } @else if (row.status === 1) {
-                <svg
-                  class="h-3.5 w-3.5"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-                Presente
-              } @else {
-                <svg
-                  class="h-3.5 w-3.5"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
+                  stroke-width="2"
                   viewBox="0 0 24 24"
                 >
                   <path
@@ -180,9 +153,51 @@
                     d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
                   />
                 </svg>
-                Justificado
-              }
-            </button>
+              </button>
+
+              <!-- Presente / Ausente -->
+              <button
+                type="button"
+                (click)="togglePresence(row)"
+                [disabled]="!isToday"
+                class="inline-flex flex-col items-center justify-center gap-1 py-4 px-4 rounded-lg border text-[10px] font-semibold transition focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed"
+                [class.bg-green-600/15]="row.status === 1"
+                [class.border-green-600/40]="row.status === 1"
+                [class.text-green-400]="row.status === 1"
+                [class.bg-red-600/15]="row.status === 0"
+                [class.border-red-600/40]="row.status === 0"
+                [class.text-red-400]="row.status === 0"
+                [class.bg-zinc-800]="row.status === 2"
+                [class.border-zinc-700]="row.status === 2"
+                [class.text-zinc-500]="row.status === 2"
+              >
+                @if (row.status === 1) {
+                  <svg
+                    class="h-6 w-6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m4.5 12.75 6 6 9-13.5"
+                    />
+                  </svg>
+                } @else {
+                  <svg
+                    class="h-6 w-6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                  </svg>
+                }
+              </button>
+            </div>
           </div>
         }
       </div>

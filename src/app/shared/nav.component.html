@@ -45,8 +45,11 @@
   <div class="flex items-stretch h-16">
     <a
       routerLink="/frequencia"
-      routerLinkActive="text-red-500"
-      class="flex-1 flex flex-col items-center justify-center gap-1 text-zinc-500 transition"
+      routerLinkActive
+      #rlaFreq="routerLinkActive"
+      [class.text-red-500]="rlaFreq.isActive"
+      [class.text-zinc-500]="!rlaFreq.isActive"
+      class="flex-1 flex flex-col items-center justify-center gap-1 transition"
     >
       <svg
         class="h-5 w-5"
@@ -66,8 +69,11 @@
 
     <a
       routerLink="/alunos"
-      routerLinkActive="text-red-500"
-      class="flex-1 flex flex-col items-center justify-center gap-1 text-zinc-500 transition"
+      routerLinkActive
+      #rlaAlunos="routerLinkActive"
+      [class.text-red-500]="rlaAlunos.isActive"
+      [class.text-zinc-500]="!rlaAlunos.isActive"
+      class="flex-1 flex flex-col items-center justify-center gap-1 transition"
     >
       <svg
         class="h-5 w-5"
@@ -87,8 +93,11 @@
 
     <a
       routerLink="/configuracoes"
-      routerLinkActive="text-red-500"
-      class="flex-1 flex flex-col items-center justify-center gap-1 text-zinc-500 transition"
+      routerLinkActive
+      #rlaConfig="routerLinkActive"
+      [class.text-red-500]="rlaConfig.isActive"
+      [class.text-zinc-500]="!rlaConfig.isActive"
+      class="flex-1 flex flex-col items-center justify-center gap-1 transition"
     >
       <svg
         class="h-5 w-5"
@@ -113,8 +122,11 @@
 
     <a
       routerLink="/account"
-      routerLinkActive="text-red-500"
-      class="flex-1 flex flex-col items-center justify-center gap-1 text-zinc-500 transition"
+      routerLinkActive
+      #rlaConta="routerLinkActive"
+      [class.text-red-500]="rlaConta.isActive"
+      [class.text-zinc-500]="!rlaConta.isActive"
+      class="flex-1 flex flex-col items-center justify-center gap-1 transition"
     >
       <svg
         class="h-5 w-5"
