@@ -1,36 +1,17 @@
 <app-nav />
 
 <div class="min-h-screen bg-zinc-950 px-4 py-8">
-  <div class="max-w-5xl mx-auto">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h2 class="text-xl font-bold text-white">Alunos</h2>
-        <p class="text-zinc-400 text-sm mt-0.5">
-          {{ students().length }} aluno{{ students().length !== 1 ? 's' : '' }} cadastrado{{
-            students().length !== 1 ? 's' : ''
-          }}
-        </p>
-      </div>
-      <button
-        (click)="openModal()"
-        class="flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-zinc-950"
-      >
-        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-        </svg>
-        Novo Aluno
-      </button>
-    </div>
-
-    <!-- Error -->
-    @if (error()) {
-      <div
-        class="mb-4 rounded-lg px-4 py-3 text-sm bg-red-600/10 text-red-400 border border-red-600/20"
-      >
-        {{ error() }}
-      </div>
-    }
+  <div class="max-w-2xl mx-auto">
+    <!-- Voltar -->
+    <a
+      routerLink="/alunos"
+      class="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition mb-6"
+    >
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+      </svg>
+      Voltar para Alunos
+    </a>
 
     <!-- Loading -->
     @if (loading()) {
@@ -48,107 +29,127 @@
         </svg>
       </div>
 
-      <!-- Empty state -->
-    } @else if (students().length === 0) {
-      <div class="flex flex-col items-center justify-center py-20 text-center">
-        <div class="w-14 h-14 rounded-full bg-zinc-800 flex items-center justify-center mb-4">
+      <!-- Error -->
+    } @else if (error()) {
+      <div class="rounded-lg px-4 py-3 text-sm bg-red-600/10 text-red-400 border border-red-600/20">
+        {{ error() }}
+      </div>
+    } @else if (student()) {
+      <!-- Header do aluno -->
+      <div class="flex items-center justify-between gap-4 mb-8">
+        <div class="flex items-center gap-4">
+          <div
+            class="w-14 h-14 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0"
+          >
+            <span class="text-xl font-bold text-white">{{
+              student()!.name.charAt(0).toUpperCase()
+            }}</span>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-white">{{ student()!.name }}</h2>
+            <p class="text-zinc-400 text-sm mt-0.5">{{ student()!.class || 'Sem turma' }}</p>
+          </div>
+        </div>
+        <button
+          (click)="openModal()"
+          class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-white text-sm font-medium px-3 py-3 rounded-full transition focus:outline-none focus:ring-2 focus:ring-zinc-600 shrink-0"
+        >
           <svg
-            class="h-7 w-7 text-zinc-500"
+            class="h-5 w-5"
             fill="none"
             stroke="currentColor"
-            stroke-width="1.5"
+            stroke-width="2"
             viewBox="0 0 24 24"
           >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"
             />
           </svg>
-        </div>
-        <p class="text-zinc-400 font-medium">Nenhum aluno cadastrado</p>
-        <p class="text-zinc-600 text-sm mt-1">Clique em "Novo Aluno" para começar.</p>
+        </button>
       </div>
 
-      <!-- Table -->
-    } @else {
-      <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b border-zinc-800">
-              <th class="text-left text-zinc-400 font-medium px-5 py-3">Nome</th>
-              <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden sm:table-cell">
-                Classe
-              </th>
-              <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden md:table-cell">
-                Idade
-              </th>
-              <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden lg:table-cell">
-                E-mail
-              </th>
-              <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden xl:table-cell">
-                Telefone
-              </th>
-              <th class="text-left text-zinc-400 font-medium px-5 py-3 hidden xl:table-cell">
-                Nascimento
-              </th>
-              <th class="px-5 py-3"></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (student of students(); track student.id) {
-              <tr
-                class="border-b border-zinc-800/60 last:border-0 hover:bg-zinc-800/30 transition cursor-pointer"
-                (click)="goToStudent(student)"
-              >
-                <td class="px-5 py-3.5 text-white font-medium">{{ student.name }}</td>
-                <td class="px-5 py-3.5 text-zinc-400 hidden sm:table-cell">
-                  {{ student.class || '—' }}
-                </td>
-                <td class="px-5 py-3.5 text-zinc-400 hidden md:table-cell">
-                  {{ calcAge(student.birth_date) }}
-                </td>
-                <td class="px-5 py-3.5 text-zinc-400 hidden lg:table-cell">
-                  {{ student.email || '—' }}
-                </td>
-                <td class="px-5 py-3.5 text-zinc-400 hidden xl:table-cell">
-                  {{ student.phone || '—' }}
-                </td>
-                <td class="px-5 py-3.5 text-zinc-400 hidden xl:table-cell">
-                  {{ formatDate(student.birth_date) }}
-                </td>
-                <td class="px-5 py-3.5 text-right w-px" (click)="$event.stopPropagation()">
-                  <button
-                    (click)="openModal(student)"
-                    class="text-xs text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-md px-3 py-1.5 transition"
-                  >
-                    Editar
-                  </button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+      <!-- Cards de frequência -->
+      <div class="grid grid-cols-3 gap-3 mb-6">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-center">
+          <p class="text-3xl font-bold text-green-400">{{ present() }}</p>
+          <p class="text-xs text-zinc-400 mt-1">Presenças</p>
+        </div>
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-center">
+          <p class="text-3xl font-bold text-red-400">{{ absent() }}</p>
+          <p class="text-xs text-zinc-400 mt-1">Faltas</p>
+        </div>
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-center">
+          <p class="text-3xl font-bold text-yellow-400">{{ justified() }}</p>
+          <p class="text-xs text-zinc-400 mt-1">Justificadas</p>
+        </div>
+      </div>
+
+      <!-- Barra de frequência -->
+      @if (totalClasses > 0) {
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-6">
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-sm text-zinc-400">Frequência geral</p>
+            <p class="text-sm font-semibold text-white">{{ attendanceRate }}%</p>
+          </div>
+          <div class="w-full bg-zinc-800 rounded-full h-2">
+            <div
+              class="h-2 rounded-full transition-all"
+              [class.bg-green-500]="attendanceRate >= 75"
+              [class.bg-yellow-500]="attendanceRate >= 50 && attendanceRate < 75"
+              [class.bg-red-500]="attendanceRate < 50"
+              [style.width.%]="attendanceRate"
+            ></div>
+          </div>
+          <p class="text-xs text-zinc-500 mt-2">
+            {{ totalClasses }} aula{{ totalClasses !== 1 ? 's' : '' }} registrada{{
+              totalClasses !== 1 ? 's' : ''
+            }}
+          </p>
+        </div>
+      }
+
+      <!-- Dados do aluno -->
+      <div class="bg-zinc-900 border border-zinc-800 rounded-xl divide-y divide-zinc-800">
+        <div class="flex items-center justify-between px-5 py-3.5">
+          <span class="text-sm text-zinc-400">Turma</span>
+          <span class="text-sm text-white font-medium">{{ student()!.class || '—' }}</span>
+        </div>
+        <div class="flex items-center justify-between px-5 py-3.5">
+          <span class="text-sm text-zinc-400">Idade</span>
+          <span class="text-sm text-white font-medium">{{ calcAge(student()!.birth_date) }}</span>
+        </div>
+        <div class="flex items-center justify-between px-5 py-3.5">
+          <span class="text-sm text-zinc-400">Data de nascimento</span>
+          <span class="text-sm text-white font-medium">{{
+            formatDate(student()!.birth_date)
+          }}</span>
+        </div>
+        <div class="flex items-center justify-between px-5 py-3.5">
+          <span class="text-sm text-zinc-400">Telefone</span>
+          <span class="text-sm text-white font-medium">{{ student()!.phone || '—' }}</span>
+        </div>
+        <div class="flex items-center justify-between px-5 py-3.5">
+          <span class="text-sm text-zinc-400">E-mail</span>
+          <span class="text-sm text-white font-medium">{{ student()!.email || '—' }}</span>
+        </div>
       </div>
     }
   </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal de edição -->
 @if (showModal()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center px-4" (click)="closeModal()">
-    <!-- Backdrop -->
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
 
-    <!-- Panel -->
     <div
       class="relative w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl"
       (click)="$event.stopPropagation()"
     >
       <div class="flex items-center justify-between mb-5">
-        <h3 class="text-white font-bold text-lg">
-          {{ editingId() ? 'Editar Aluno' : 'Novo Aluno' }}
-        </h3>
+        <h3 class="text-white font-bold text-lg">Editar Aluno</h3>
         <button (click)="closeModal()" class="text-zinc-500 hover:text-white transition">
           <svg
             class="h-5 w-5"
@@ -322,7 +323,7 @@
                 Salvando...
               </span>
             } @else {
-              {{ editingId() ? 'Salvar alterações' : 'Cadastrar aluno' }}
+              Salvar alterações
             }
           </button>
         </div>

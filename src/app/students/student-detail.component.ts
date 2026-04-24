@@ -1,7 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
 import { Student, Turma, SupabaseService } from '../services/supabase.service';
 import { NavComponent } from '../shared/nav.component';
 
@@ -17,68 +16,84 @@ const emptyForm = (): StudentForm => ({
 });
 
 @Component({
-  selector: 'app-students',
+  selector: 'app-student-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavComponent, RouterLink],
-  templateUrl: './students.component.html',
+  imports: [NavComponent, RouterLink, FormsModule],
+  templateUrl: './student-detail.component.html',
 })
-export class StudentsComponent implements OnInit {
-  students = signal<Student[]>([]);
+export class StudentDetailComponent implements OnInit {
+  student = signal<Student | null>(null);
   turmas = signal<Turma[]>([]);
   loading = signal(true);
+  error = signal<string | null>(null);
+
+  present = signal(0);
+  absent = signal(0);
+  justified = signal(0);
+
   showModal = signal(false);
   saving = signal(false);
-  error = signal<string | null>(null);
   modalError = signal<string | null>(null);
-
-  editingId = signal<string | null>(null);
   form: StudentForm = emptyForm();
 
-  constructor(private supabase: SupabaseService, private router: Router) {}
+  private studentId = '';
 
-  goToStudent(student: Student) {
-    if (student.id) this.router.navigate(['/alunos', student.id]);
-  }
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private supabase: SupabaseService,
+  ) {}
 
   async ngOnInit() {
-    await Promise.all([this.loadStudents(), this.loadTurmas()]);
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.router.navigate(['/alunos']);
+      return;
+    }
+    this.studentId = id;
+    await Promise.all([this.loadData(), this.loadTurmas()]);
   }
 
-  async loadStudents() {
+  private async loadData() {
     this.loading.set(true);
     this.error.set(null);
     try {
-      const { data, error } = await this.supabase.getStudents();
-      if (error) throw error;
-      this.students.set(data ?? []);
+      const [studentRes, attendanceRes] = await Promise.all([
+        this.supabase.getStudentById(this.studentId),
+        this.supabase.getAttendanceByStudent(this.studentId),
+      ]);
+
+      if (studentRes.error) throw studentRes.error;
+      this.student.set(studentRes.data);
+
+      const records = attendanceRes.data ?? [];
+      this.present.set(records.filter(r => r.status === 1).length);
+      this.absent.set(records.filter(r => r.status === 0).length);
+      this.justified.set(records.filter(r => r.status === 2).length);
     } catch (err: any) {
-      this.error.set(err.message ?? 'Erro ao carregar alunos.');
+      this.error.set(err.message ?? 'Erro ao carregar dados do aluno.');
     } finally {
       this.loading.set(false);
     }
   }
 
-  async loadTurmas() {
+  private async loadTurmas() {
     const { data } = await this.supabase.getClasses();
     this.turmas.set(data ?? []);
   }
 
-  openModal(student?: Student) {
+  openModal() {
+    const s = this.student();
+    if (!s) return;
     this.modalError.set(null);
-    if (student) {
-      this.editingId.set(student.id ?? null);
-      this.form = {
-        name: student.name,
-        email: student.email ?? null,
-        phone: student.phone ?? null,
-        birth_date: student.birth_date ?? null,
-        class: student.class ?? null,
-        class_id: student.class_id ?? null,
-      };
-    } else {
-      this.editingId.set(null);
-      this.form = emptyForm();
-    }
+    this.form = {
+      name: s.name,
+      email: s.email ?? null,
+      phone: s.phone ?? null,
+      birth_date: s.birth_date ?? null,
+      class: s.class ?? null,
+      class_id: s.class_id ?? null,
+    };
     this.showModal.set(true);
   }
 
@@ -110,26 +125,15 @@ export class StudentsComponent implements OnInit {
     this.modalError.set(null);
 
     try {
-      const id = this.editingId();
-      if (id) {
-        const { error } = await this.supabase.updateStudent(id, this.form);
-        if (error) throw error;
-      } else {
-        const { error } = await this.supabase.createStudent(this.form);
-        if (error) throw error;
-      }
+      const { error } = await this.supabase.updateStudent(this.studentId, this.form);
+      if (error) throw error;
       this.closeModal();
-      await this.loadStudents();
+      await this.loadData();
     } catch (err: any) {
       this.modalError.set(err.message ?? 'Erro ao salvar aluno.');
     } finally {
       this.saving.set(false);
     }
-  }
-
-  formatDate(date: string | null | undefined): string {
-    if (!date) return '—';
-    return new Date(date + 'T00:00:00').toLocaleDateString('pt-BR');
   }
 
   calcAge(birthDate: string | null | undefined): string {
@@ -142,6 +146,11 @@ export class StudentsComponent implements OnInit {
     return age + ' anos';
   }
 
+  formatDate(date: string | null | undefined): string {
+    if (!date) return '—';
+    return new Date(date + 'T00:00:00').toLocaleDateString('pt-BR');
+  }
+
   formatDays(days: string[]): string {
     const map: Record<string, string> = {
       seg: 'Seg', ter: 'Ter', qua: 'Qua',
@@ -152,5 +161,15 @@ export class StudentsComponent implements OnInit {
 
   formatTime(time: string): string {
     return time?.substring(0, 5) ?? '';
+  }
+
+  get totalClasses(): number {
+    return this.present() + this.absent() + this.justified();
+  }
+
+  get attendanceRate(): number {
+    const total = this.totalClasses;
+    if (total === 0) return 0;
+    return Math.round(((this.present() + this.justified()) / total) * 100);
   }
 }

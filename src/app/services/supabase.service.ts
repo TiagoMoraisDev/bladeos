@@ -128,6 +128,21 @@ export class SupabaseService {
     return this.supabase.from('students').delete().eq('id', id);
   }
 
+  getStudentById(id: string) {
+    return this.supabase
+      .from('students')
+      .select('id, name, email, phone, birth_date, class, class_id, created_at')
+      .eq('id', id)
+      .single();
+  }
+
+  getAttendanceByStudent(studentId: string) {
+    return this.supabase
+      .from('attendance')
+      .select('id, status')
+      .eq('student_id', studentId);
+  }
+
   getClasses() {
     return this.supabase
       .from('classes')

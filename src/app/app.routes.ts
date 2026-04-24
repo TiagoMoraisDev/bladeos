@@ -13,6 +13,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'alunos/:id',
+    loadComponent: () => import('./students/student-detail.component').then(m => m.StudentDetailComponent),
+    canActivate: [authGuard],
+  },
+  {
     path: 'frequencia',
     loadComponent: () => import('./attendance/attendance.component').then(m => m.AttendanceComponent),
     canActivate: [authGuard],

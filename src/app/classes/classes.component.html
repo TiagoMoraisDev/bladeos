@@ -2,22 +2,23 @@
 
 <div class="min-h-screen bg-zinc-950 px-4 py-8">
   <div class="max-w-4xl mx-auto">
-
     <!-- Header -->
+    <a
+      routerLink="/configuracoes"
+      class="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition mb-6"
+    >
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+      </svg>
+      Voltar para Configurações
+    </a>
     <div class="flex items-center gap-3 mb-6">
-      <a
-        routerLink="/configuracoes"
-        class="text-zinc-500 hover:text-white transition"
-        title="Voltar para Configurações"
-      >
-        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-        </svg>
-      </a>
       <div class="flex-1">
         <h2 class="text-xl font-bold text-white">Turmas</h2>
         <p class="text-zinc-400 text-sm mt-0.5">
-          {{ classes().length }} turma{{ classes().length !== 1 ? 's' : '' }} cadastrada{{ classes().length !== 1 ? 's' : '' }}
+          {{ classes().length }} turma{{ classes().length !== 1 ? 's' : '' }} cadastrada{{
+            classes().length !== 1 ? 's' : ''
+          }}
         </p>
       </div>
       <button
@@ -33,7 +34,9 @@
 
     <!-- Error -->
     @if (error()) {
-      <div class="mb-4 rounded-lg px-4 py-3 text-sm bg-red-600/10 text-red-400 border border-red-600/20">
+      <div
+        class="mb-4 rounded-lg px-4 py-3 text-sm bg-red-600/10 text-red-400 border border-red-600/20"
+      >
         {{ error() }}
       </div>
     }
@@ -42,30 +45,45 @@
     @if (loading()) {
       <div class="flex justify-center py-20">
         <svg class="animate-spin h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
         </svg>
       </div>
 
-    <!-- Empty state -->
+      <!-- Empty state -->
     } @else if (classes().length === 0) {
       <div class="flex flex-col items-center justify-center py-20 text-center">
         <div class="w-14 h-14 rounded-full bg-zinc-800 flex items-center justify-center mb-4">
-          <svg class="h-7 w-7 text-zinc-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+          <svg
+            class="h-7 w-7 text-zinc-500"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"
+            />
           </svg>
         </div>
         <p class="text-zinc-400 font-medium">Nenhuma turma cadastrada</p>
         <p class="text-zinc-600 text-sm mt-1">Clique em "Nova Turma" para começar.</p>
       </div>
 
-    <!-- List -->
+      <!-- List -->
     } @else {
       <div class="grid gap-3 sm:grid-cols-2">
         @for (turma of classes(); track turma.id) {
           <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 flex flex-col gap-3">
-
             <div class="flex items-start justify-between">
               <h3 class="text-white font-semibold">{{ turma.name }}</h3>
               <button
@@ -91,26 +109,31 @@
             </div>
 
             <div class="flex items-center gap-2 text-sm text-zinc-400">
-              <svg class="h-4 w-4 text-zinc-600 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              <svg
+                class="h-4 w-4 text-zinc-600 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                />
               </svg>
               {{ formatTime(turma.start_time) }} – {{ formatTime(turma.end_time) }}
             </div>
-
           </div>
         }
       </div>
     }
-
   </div>
 </div>
 
 <!-- Modal -->
 @if (showModal()) {
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center px-4"
-    (click)="closeModal()"
-  >
+  <div class="fixed inset-0 z-50 flex items-center justify-center px-4" (click)="closeModal()">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
 
     <div
@@ -122,20 +145,27 @@
           {{ editingId() ? 'Editar Turma' : 'Nova Turma' }}
         </h3>
         <button (click)="closeModal()" class="text-zinc-500 hover:text-white transition">
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <svg
+            class="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
 
       @if (modalError()) {
-        <div class="mb-4 rounded-lg px-4 py-3 text-sm bg-red-600/10 text-red-400 border border-red-600/20">
+        <div
+          class="mb-4 rounded-lg px-4 py-3 text-sm bg-red-600/10 text-red-400 border border-red-600/20"
+        >
           {{ modalError() }}
         </div>
       }
 
       <form (ngSubmit)="saveClass()">
-
         <!-- Nome -->
         <div class="mb-5">
           <label for="className" class="block text-sm font-medium text-zinc-300 mb-1.5">
@@ -218,7 +248,14 @@
             @if (saving()) {
               <span class="flex items-center justify-center gap-2">
                 <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                 </svg>
                 Salvando...
@@ -228,7 +265,6 @@
             }
           </button>
         </div>
-
       </form>
     </div>
   </div>
