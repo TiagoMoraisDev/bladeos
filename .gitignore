@@ -6,9 +6,7 @@
 /tmp
 /out-tsc
 /bazel-out
-/src/environments/environment.ts
-/src/environments/environment.development.ts
-/src/environments/environment.production.ts
+
 
 # Environment variables
 .env
