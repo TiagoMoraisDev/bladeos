@@ -40,6 +40,7 @@ export interface Student {
   birth_date?: string | null;
   class?: string | null;
   class_id?: string | null;
+  avatar_url?: string | null;
   created_at?: string;
   created_by?: string;
 }
@@ -104,7 +105,7 @@ export class SupabaseService {
   getStudents() {
     return this.supabase
       .from('students')
-      .select('id, name, email, phone, birth_date, class, class_id, created_at')
+      .select('id, name, email, phone, birth_date, class, class_id, avatar_url, created_at')
       .order('name', { ascending: true });
   }
 
@@ -131,9 +132,20 @@ export class SupabaseService {
   getStudentById(id: string) {
     return this.supabase
       .from('students')
-      .select('id, name, email, phone, birth_date, class, class_id, created_at')
+      .select('id, name, email, phone, birth_date, class, class_id, avatar_url, created_at')
       .eq('id', id)
       .single();
+  }
+
+  async uploadStudentAvatar(studentId: string, file: File): Promise<string> {
+    const ext = file.name.split('.').pop() ?? 'jpg';
+    const path = `students/${studentId}/avatar.${ext}`;
+    const { error } = await this.supabase.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true });
+    if (error) throw error;
+    const { data } = this.supabase.storage.from('avatars').getPublicUrl(path);
+    return data.publicUrl;
   }
 
   getAttendanceByStudent(studentId: string) {

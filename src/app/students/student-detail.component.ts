@@ -13,6 +13,7 @@ const emptyForm = (): StudentForm => ({
   birth_date: null,
   class: null,
   class_id: null,
+  avatar_url: null,
 });
 
 @Component({
@@ -35,6 +36,8 @@ export class StudentDetailComponent implements OnInit {
   saving = signal(false);
   modalError = signal<string | null>(null);
   form: StudentForm = emptyForm();
+  avatarFile = signal<File | null>(null);
+  avatarPreview = signal<string | null>(null);
 
   private studentId = '';
 
@@ -86,6 +89,8 @@ export class StudentDetailComponent implements OnInit {
     const s = this.student();
     if (!s) return;
     this.modalError.set(null);
+    this.avatarFile.set(null);
+    this.avatarPreview.set(s.avatar_url ?? null);
     this.form = {
       name: s.name,
       email: s.email ?? null,
@@ -93,12 +98,25 @@ export class StudentDetailComponent implements OnInit {
       birth_date: s.birth_date ?? null,
       class: s.class ?? null,
       class_id: s.class_id ?? null,
+      avatar_url: s.avatar_url ?? null,
     };
     this.showModal.set(true);
   }
 
   closeModal() {
     this.showModal.set(false);
+    this.avatarFile.set(null);
+    this.avatarPreview.set(null);
+  }
+
+  onAvatarChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.avatarFile.set(file);
+    const reader = new FileReader();
+    reader.onload = (e) => this.avatarPreview.set(e.target?.result as string);
+    reader.readAsDataURL(file);
   }
 
   selectTurma(turma: Turma) {
@@ -125,6 +143,12 @@ export class StudentDetailComponent implements OnInit {
     this.modalError.set(null);
 
     try {
+      if (this.avatarFile()) {
+        this.form.avatar_url = await this.supabase.uploadStudentAvatar(
+          this.studentId,
+          this.avatarFile()!,
+        );
+      }
       const { error } = await this.supabase.updateStudent(this.studentId, this.form);
       if (error) throw error;
       this.closeModal();

@@ -14,6 +14,7 @@ const emptyForm = (): StudentForm => ({
   birth_date: null,
   class: null,
   class_id: null,
+  avatar_url: null,
 });
 
 @Component({
@@ -33,6 +34,8 @@ export class StudentsComponent implements OnInit {
 
   editingId = signal<string | null>(null);
   form: StudentForm = emptyForm();
+  avatarFile = signal<File | null>(null);
+  avatarPreview = signal<string | null>(null);
 
   constructor(private supabase: SupabaseService, private router: Router) {}
 
@@ -65,8 +68,10 @@ export class StudentsComponent implements OnInit {
 
   openModal(student?: Student) {
     this.modalError.set(null);
+    this.avatarFile.set(null);
     if (student) {
       this.editingId.set(student.id ?? null);
+      this.avatarPreview.set(student.avatar_url ?? null);
       this.form = {
         name: student.name,
         email: student.email ?? null,
@@ -74,9 +79,11 @@ export class StudentsComponent implements OnInit {
         birth_date: student.birth_date ?? null,
         class: student.class ?? null,
         class_id: student.class_id ?? null,
+        avatar_url: student.avatar_url ?? null,
       };
     } else {
       this.editingId.set(null);
+      this.avatarPreview.set(null);
       this.form = emptyForm();
     }
     this.showModal.set(true);
@@ -84,6 +91,18 @@ export class StudentsComponent implements OnInit {
 
   closeModal() {
     this.showModal.set(false);
+    this.avatarFile.set(null);
+    this.avatarPreview.set(null);
+  }
+
+  onAvatarChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.avatarFile.set(file);
+    const reader = new FileReader();
+    reader.onload = (e) => this.avatarPreview.set(e.target?.result as string);
+    reader.readAsDataURL(file);
   }
 
   selectTurma(turma: Turma) {
@@ -112,11 +131,18 @@ export class StudentsComponent implements OnInit {
     try {
       const id = this.editingId();
       if (id) {
+        if (this.avatarFile()) {
+          this.form.avatar_url = await this.supabase.uploadStudentAvatar(id, this.avatarFile()!);
+        }
         const { error } = await this.supabase.updateStudent(id, this.form);
         if (error) throw error;
       } else {
-        const { error } = await this.supabase.createStudent(this.form);
+        const { data, error } = await this.supabase.createStudent(this.form);
         if (error) throw error;
+        if (this.avatarFile() && data?.id) {
+          const url = await this.supabase.uploadStudentAvatar(data.id, this.avatarFile()!);
+          await this.supabase.updateStudent(data.id, { ...this.form, avatar_url: url });
+        }
       }
       this.closeModal();
       await this.loadStudents();

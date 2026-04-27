@@ -101,7 +101,26 @@
                 class="border-b border-zinc-800/60 last:border-0 hover:bg-zinc-800/30 transition cursor-pointer"
                 (click)="goToStudent(student)"
               >
-                <td class="px-5 py-3.5 text-white font-medium">{{ student.name }}</td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-3">
+                    @if (student.avatar_url) {
+                      <img
+                        [src]="student.avatar_url"
+                        class="w-8 h-8 rounded-full object-cover shrink-0 border border-zinc-700"
+                        [alt]="student.name"
+                      />
+                    } @else {
+                      <div
+                        class="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0"
+                      >
+                        <span class="text-xs font-bold text-white">{{
+                          student.name.charAt(0).toUpperCase()
+                        }}</span>
+                      </div>
+                    }
+                    <span class="text-white font-medium">{{ student.name }}</span>
+                  </div>
+                </td>
                 <td class="px-5 py-3.5 text-zinc-400 hidden sm:table-cell">
                   {{ student.class || '—' }}
                 </td>
@@ -142,10 +161,10 @@
 
     <!-- Panel -->
     <div
-      class="relative w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl"
+      class="relative w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl max-h-[90vh] flex flex-col"
       (click)="$event.stopPropagation()"
     >
-      <div class="flex items-center justify-between mb-5">
+      <div class="flex items-center justify-between p-6 pb-0 shrink-0">
         <h3 class="text-white font-bold text-lg">
           {{ editingId() ? 'Editar Aluno' : 'Novo Aluno' }}
         </h3>
@@ -162,6 +181,7 @@
         </button>
       </div>
 
+      <div class="overflow-y-auto flex-1 p-6 pt-5">
       @if (modalError()) {
         <div
           class="mb-4 rounded-lg px-4 py-3 text-sm bg-red-600/10 text-red-400 border border-red-600/20"
@@ -171,6 +191,53 @@
       }
 
       <form (ngSubmit)="saveStudent()" #studentForm="ngForm">
+        <!-- Avatar Upload -->
+        <div class="flex flex-col items-center mb-5">
+          <div class="relative group">
+            @if (avatarPreview()) {
+              <img
+                [src]="avatarPreview()"
+                class="w-20 h-20 rounded-full object-cover border-2 border-zinc-700"
+                alt="Foto do aluno"
+              />
+            } @else {
+              <div
+                class="w-20 h-20 rounded-full bg-zinc-800 border-2 border-zinc-700 flex items-center justify-center"
+              >
+                <span class="text-2xl font-bold text-white">{{
+                  form.name.charAt(0).toUpperCase() || '?'
+                }}</span>
+              </div>
+            }
+            <label
+              for="avatarInputList"
+              class="absolute inset-0 rounded-full flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition cursor-pointer"
+            >
+              <svg
+                class="h-5 w-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"
+                />
+              </svg>
+            </label>
+            <input
+              id="avatarInputList"
+              type="file"
+              accept="image/*"
+              class="hidden"
+              (change)="onAvatarChange($event)"
+            />
+          </div>
+          <p class="text-xs text-zinc-500 mt-2">Clique para adicionar foto</p>
+        </div>
+
         <div class="mb-4">
           <label for="name" class="block text-sm font-medium text-zinc-300 mb-1.5">
             Nome <span class="text-red-500">*</span>
@@ -327,6 +394,7 @@
           </button>
         </div>
       </form>
+      </div>
     </div>
   </div>
 }
